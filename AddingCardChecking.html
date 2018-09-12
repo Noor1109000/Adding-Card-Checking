@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Game Play</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<style>
+    .btn{
+        background: red;
+        text-align: center;
+        border-radius: 10px;
+        font-size: 1em;
+        padding: 15px;
+        color: white;
+    
+    }
+
+    .btn:hover{
+        background: crimson;
+        cursor: pointer;
+    }
+
+    .gametitle{
+        display: inline-block;
+    }
+
+    .flipImage{
+        width: 100px;
+    }
+    .game{
+        display: inline-block;
+        margin: 10px;
+    }
+
+
+</style>
+
+<body>
+    <div id="output">Complete Js Course</div>
+    <div id="wrapper">
+        <div id="start" class="btn">Start</div>
+        <div id="score"></div>
+        <div id="message"></div>
+        <div id="gameboard"></div>
+    
+    </div>
+    
+    <script>
+        var playLockout = true;
+        var gamePlay = false;
+        var tileImages =[], tileArray = [], tfo = [];
+
+        var sb = document.getElementById('start');
+        var message = document.getElementById('message');
+        var score = document.getElementById("score");
+        var gameboard = document.getElementById("gameboard"); 
+        var cardFlipped = -1;
+        var timer;
+
+        sb.addEventListener("click", startGame);
+
+    function startGame(){
+        //hide start button
+        sb.style.display = 'none';
+        message.innerHTML = "its working" +gamePlay;
+        if(!gamePlay){
+            gamePlay = true;
+            buildArray();
+            tileArray = tileImages.concat(tileImages);
+            shuffleArray(tileArray);
+            //buildboard
+            buildboard();
+        }
+    }
+
+      
+
+        function shuffleArray(array){
+            for(var x=array.length-1;x>0;x--){
+                var holder = Math.floor(Math.random()*(x+1));
+                var itemValue = array[x];
+                array[x] = array[holder];
+                array[holder] = itemValue;
+                
+            }
+
+            return array;
+        }
+        
+        function buildboard(){
+            var html = "";
+            var x= 0;
+            tileArray.forEach(function(ele){
+                x++;
+                html += '<div class="game Tile">';
+                html += '<img id="cardz'+x+'" src="http://via.placeholder.com/250/000000/ffffff?text=click" onclick="pickCard('+(x-1)+',this)" class="flipImage"></div>';
+            });
+
+            gameboard.innerHTML = html; 
+        }
+        
+        function pickCard(i, t){
+            console.log(event.target);
+            //not a array of flipped over
+            // not locked out
+
+            if(playLockout){           
+            if(cardFlipped>=0){
+                cardFlip(i, t);
+                //check to see if its a match
+                if(checkSrc(tfo[tfo.length -1]) == checkSrc(tfo[tfo.length-2])){
+                    message.innerHTML = "Match Found";
+                    cardFlipped = -1;
+                    playLockout = false;
+                }
+                else{
+                    message.innerHTML = "No Match";
+                    timer= setInterval(hideCard, 1000);
+                }
+
+            }else{
+                cardFlipped = i;
+                cardFlip(i,t);
+            }
+            }else{
+                message.innerHTML = "Locked Out";
+            }
+        }
+
+        function hideCard(){
+            for(var x=0;x<2;x++){
+                var vid = tfo.pop();
+                document.getElementById(vid).src = 'http://via.placeholder.com/250/000000/ffffff?text=click';
+            }
+            clearInterval(timer);
+            cardFlipped = -1;
+            playLockout = false;
+            message.innerHTML = "Select Again";
+        
+        }
+
+        function checkSrc(a){
+            return document.getElementById(a).src;
+        }
+        function cardFlip(i, t){
+            t.src = "http://via.placeholder.com/250/000000/ffffff?text="+tileArray[i];
+            tfo.push(t.id);
+            
+
+        }
+        
+        function buildArray(){
+            for(var x=1;x<7;x++){
+                tileImages.push(x + '.jpg');
+            }
+        }
+
+    
+    </script>
+</body>
+</html>
